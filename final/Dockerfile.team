@@ -1,0 +1,14 @@
+from ubuntu:22.04
+
+run apt update && \
+	apt install -y openssh-server sudo && \
+	mkdir /var/run/sshd && \
+	useradd -m -s /bin/bash team && \
+	echo "team ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+run mkdir -p /home/team/.ssh && \
+	chown team:team /home/team/.ssh && \
+	chmod 700 /home/team/.ssh
+
+EXPOSE 22
+cmd ['/usr/sbin/sshd", "-D"]

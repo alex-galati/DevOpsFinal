@@ -1,0 +1,7 @@
+FROM ubuntu:22.04
+
+run apt update && \
+	apt install -y openssh-client ansible sudo vim make && \
+	mkdir -p /root/.ssh
+
+WORKDIR /ansible

@@ -1,0 +1,32 @@
+version: "3"
+services:
+  ctf-admin:
+    build:
+      context: .
+      #dockerfile:Dockerfile.admin
+    container-name: ctf-admin
+    volumes:
+      - ./ansible:/ansible
+    networks:
+      -mynet
+    command: ["tail", "-f", "/dev/null"]
+  red-team:
+    build:
+      context: .
+      #dockerfile: Dockerfile.team
+    container_name: red-team
+	networks:
+	  - mynet
+    ports:
+      - "2222:22"
+  fuschia-team:
+	build:
+	  context: .
+	  #dockerfile: Dockerfile.dev
+	container_name: fuschia-team
+	networks: 
+	  - mynet
+	ports:
+	  - "2223:22"
+networks:
+  mynet:

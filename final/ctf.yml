@@ -1,0 +1,9 @@
+ctf:
+  rounds: 5
+  teams:
+    - red-team
+    - fuchsia-team
+  services:
+    - A
+    - B
+#apparently supposed to use this yml file to build the dokcer-compose?
