@@ -1,11 +1,3 @@
-# We will need to pip-install the following library for this to work.
-#
-# pip install pyyaml
-#
-# This is just an example of how to parse YAML data.  You will need
-# to modify this code to generate the files described in the
-# Canvas assignment.
-
 import yaml
 
 FILENAME = 'ctf.yml'
@@ -17,5 +9,12 @@ data = yaml.safe_load(open(FILENAME).read())
 teams = data['ctf']['teams']
 services = data['ctf']['services']
 
-print(teams)
-print(services)
+admin = open("Dockerfile.ctf-admin", "w")
+admin.write('''
+from ubuntu:latest
+
+run apt-get update && apt-get install -y \
+openssh-client sshpass ansible sudo vim make python3.10-venv
+
+run useradd -m ctf-admin && echo "ctf-admin ALL=(ALL) "
+''')
