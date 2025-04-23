@@ -1,0 +1,42 @@
+
+# docker-compose.yml
+version: "3"
+
+services:
+  ctf-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.ctf-admin
+    container_name: ctf-admin
+    volumes:
+      - ./ansible-playbooks:/ansible-playbooks
+    networks:
+      - ctf-network
+command: ["tail", "-f", "/dev/null"]
+
+  red-team: 
+    build:
+      context: .
+      dockerfile: Dockerfile.ctf
+	container_name: red-team
+    network:
+      - ctf-network
+    ports:
+	  - "5000:22"
+      - "5001:5000"
+      - "5002:5001"
+
+  fuchsia-team: 
+    build:
+      context: .
+      dockerfile: Dockerfile.ctf
+	container_name: fuchsia-team
+    network:
+      - ctf-network
+    ports:
+	  - "5010:22"
+      - "5011:5000"
+      - "5012:5001"
+
+networks:
+  ctf-network:

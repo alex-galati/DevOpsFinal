@@ -1,0 +1,13 @@
+
+from ubuntu:latest
+
+run apt-get update && apt-get install -y \
+	openssh-client sshpass ansible sudo vim make python3.10-venv
+
+run useradd -m ctf-admin && \
+	echo "ctf-admin:123" | chpasswd && \
+	echo "ctf-admin ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/ctf-admin && \
+	chmod 0440 /etc/sudoers.d/ctf-admin
+	
+user ctf-admin
+workdir /ansible

@@ -1,0 +1,18 @@
+
+from ubuntu:latest
+
+run apt get update && apt-get install -y \ 
+	openssh-server sudo vim python3.10-venv
+
+run useradd -m ctf && \
+	echo "ctf:123" | chpasswd
+
+copy services /home/ctf/services
+copy ansible-playbooks /home/ctf/ansible-playbooks
+
+expose 22   # ssh
+expose 5000 # service-A
+expose 5001 # service-B
+
+WORKDIR /home/ctf
+CMD ["/usr/sbin/sshd", "-D"]
