@@ -12,17 +12,17 @@ services:
       - ./ansible-playbooks:/ansible-playbooks
     networks:
       - ctf-network
-command: ["tail", "-f", "/dev/null"]
+    command: ["tail", "-f", "/dev/null"]
 
   red-team: 
     build:
       context: .
       dockerfile: Dockerfile.ctf
-	container_name: red-team
-    network:
+    container_name: red-team
+    networks:
       - ctf-network
     ports:
-	  - "5000:22"
+      - "5000:22"
       - "5001:5000"
       - "5002:5001"
 
@@ -30,11 +30,11 @@ command: ["tail", "-f", "/dev/null"]
     build:
       context: .
       dockerfile: Dockerfile.ctf
-	container_name: fuchsia-team
-    network:
+    container_name: fuchsia-team
+    networks:
       - ctf-network
     ports:
-	  - "5010:22"
+      - "5010:22"
       - "5011:5000"
       - "5012:5001"
 

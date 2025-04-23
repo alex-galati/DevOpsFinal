@@ -14,16 +14,18 @@ admin = open("Dockerfile.ctf-admin", "w")
 admin.write('''
 from ubuntu:latest
 
-run apt-get update && apt-get install -y \\
-	openssh-client sshpass ansible sudo vim make python3.10-venv
+run apt-get update && apt-get install -y openssh-client sshpass ansible sudo vim make python3-venv fortune cowsay curl
 
-run useradd -m ctf-admin && \\
-	echo "ctf-admin:123" | chpasswd && \\
-	echo "ctf-admin ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/ctf-admin && \\
+run useradd -m ctf-admin && \
+	echo "ctf-admin:123" | chpasswd && \
+	echo "ctf-admin ALL=(ALL) NOPASSWD:ALL" >/etc/sudoers.d/ctf-admin && \
 	chmod 0440 /etc/sudoers.d/ctf-admin
-	
+
+copy test.sh /home/ctf-admin
+run chown -R ctf-admin:ctf-admin /home/ctf-admin/test.sh
+
 user ctf-admin
-workdir /ansible
+workdir /
 ''')
 
 admin.close()
@@ -32,21 +34,25 @@ ctf = open("Dockerfile.ctf", "w")
 ctf.write('''
 from ubuntu:latest
 
-run apt get update && apt-get install -y \ 
-	openssh-server sudo vim python3.10-venv
+run apt-get update && apt-get install -y openssh-server sudo vim python3-venv fortune cowsay
 
-run useradd -m ctf && \\
+run useradd -m ctf && \
 	echo "ctf:123" | chpasswd
+
+RUN mkdir -p /run/sshd
 
 copy services /home/ctf/services
 copy ansible-playbooks /home/ctf/ansible-playbooks
 
-expose 22   # ssh
+RUN chown -R ctf:ctf /home/ctf/ansible-playbooks
+run chown -R ctf:ctf /home/ctf/services
+
+expose 22
 ''')
 ctf = open("Dockerfile.ctf", "a")
 portNum = 5000
 for service in services:
-	string = "expose " + str(portNum) + " # service-" + service + "\n"
+	string = "expose " + str(portNum) + "\n"
 	ctf.write(string)
 	portNum += 1
 
@@ -71,7 +77,7 @@ services:
       - ./ansible-playbooks:/ansible-playbooks
     networks:
       - ctf-network
-command: ["tail", "-f", "/dev/null"]
+    command: ["tail", "-f", "/dev/null"]
 ''')
 compose = open("docker-compose.yml", "a")
 basePortNum = 5000
@@ -82,11 +88,11 @@ for team in teams:
     build:
       context: .
       dockerfile: Dockerfile.ctf
-	container_name: {team}
-    network:
+    container_name: {team}
+    networks:
       - ctf-network
     ports:
-	  - "{str(basePortNum + (currentIndex * 10))}:22"
+      - "{str(basePortNum + (currentIndex * 10))}:22"
 '''
 	compose.write(string)
 	additionalPorts = 0
@@ -139,7 +145,7 @@ string = '''
 start.write(string)
 start.close()
 #--------WRITING THE stop.yml------#
-stop = open("", "w")
+stop = open("ansible-playbooks/stop.yml", "w")
 string = '''
 - name: Set up servers
   hosts: ctf_servers
